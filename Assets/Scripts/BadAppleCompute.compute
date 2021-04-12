@@ -1,0 +1,26 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel BadApple
+
+struct CellData {
+	float2 position;
+	float4 color;
+};
+
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+RWStructuredBuffer<CellData> result;
+Texture2D<float4> source;
+int widthCount;
+
+[numthreads(6, 6, 1)]
+void BadApple(uint3 id : SV_DispatchThreadID, uint3 thread : SV_GroupThreadID, uint3 group : SV_GroupID)
+{
+	CellData data;
+	data.color = source[id.xy];
+	data.position = (float2)group.xy;
+
+	if (thread.x == 0 && thread.y == 0)
+		result[group.y * widthCount + group.x] = data;
+
+}
